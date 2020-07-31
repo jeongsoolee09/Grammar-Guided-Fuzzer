@@ -32,6 +32,7 @@
 
 
 (defun collect-simple-types (lst acc)
+  "각 type alias 정의에 대해서, type 이름과 alias의 쌍을 모은다."
   (if (null lst)
       acc
       (let ((line (car lst)))
@@ -63,12 +64,13 @@
 
 
 ;; this function is broken!
-(defun collect-constructors (lst)
-  (loop for line in lst
-        when (or (search "type" line)
-                 (search "and" line))
-          do (loop-finish)
-        collect line))
+(defun collect-constructors (lst acc)
+  (if (null lst)
+      nil
+      (let ((line (car lst)))
+        (if (str:starts-with? "|" (str:trim line))
+            (collect-constructors (cdr lst) (cons line acc))
+            (collect-constructors (cdr lst) acc)))))
 
 
   ;; for debugging purposes
