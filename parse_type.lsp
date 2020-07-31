@@ -46,7 +46,7 @@
             (collect-simple-types (cdr lst) acc)))))
 
 
-(defun collect-complex-types (lst acc)
+(defun collect-complex-types-inner (lst acc)
   "여러 개의 constructor를 가진 type들에 대해, type 이름과 constructor list의 쌍을 모은다."
   (if (null lst)
       acc
@@ -59,24 +59,31 @@
                                   (car (extract-type-name line))
                                   (extract-type-name line))))
               (let ((type-and-constructors (cons type-name constructors)))
-                (collect-complex-types (cdr lst) (cons type-and-constructors acc))))
-            (collect-complex-types (cdr lst) acc)))))
+                (collect-complex-types-inner (cdr lst) (cons type-and-constructors acc))))
+            (collect-complex-types-inner (cdr lst) acc)))))
 
 
-;; this function is broken!
-(defun collect-constructors (lst acc)
+(defun collect-complex-types (lst)
+  (collect-complex-types-inner lst ()))
+
+
+(defun collect-constructors-inner (lst acc)
   (if (null lst)
       nil
       (let ((line (car lst)))
         (if (str:starts-with? "|" (str:trim line))
-            (collect-constructors (cdr lst) (cons line acc))
-            (collect-constructors (cdr lst) acc)))))
+            (collect-constructors-inner (cdr lst) (cons line acc))
+            (collect-constructors-inner (cdr lst) acc)))))
+
+(defun collect-constructors (lst)
+  (collect-constructors-inner lst ()))
 
 
-  ;; for debugging purposes
+;; for debugging purposes
 (defun print-hash-table-entry (key value)
   (format t "~a => ~a~%" key value))
 
 
+;; for debugging purposes
 (defun print-hash-table (hashtbl)
   (maphash #'print-hash-table-entry hashtbl))
