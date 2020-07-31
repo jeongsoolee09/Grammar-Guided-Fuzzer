@@ -31,8 +31,7 @@
     (str:ends-with? "=" string_)))
 
 
-(defun collect-simple-types (lst acc)
-  "각 type alias 정의에 대해서, type 이름과 alias의 쌍을 모은다."
+(defun collect-simple-types-inner (lst acc)
   (if (null lst)
       acc
       (let ((line (car lst)))
@@ -42,12 +41,16 @@
             (let* ((lhs (car (extract-type-name line)))
                    (rhs (cdr (extract-type-name line)))
                    (type-and-def (cons lhs rhs)))
-              (collect-simple-types (cdr lst) (cons type-and-def acc)))
-            (collect-simple-types (cdr lst) acc)))))
+              (collect-simple-types-inner (cdr lst) (cons type-and-def acc)))
+            (collect-simple-types-inner (cdr lst) acc)))))
+
+
+(defun collect-simple-types (lst)
+  "각 type alias 정의에 대해서, type 이름과 alias의 쌍을 모은다."
+  (collect-simple-types-inner lst ()))
 
 
 (defun collect-complex-types-inner (lst acc)
-  "여러 개의 constructor를 가진 type들에 대해, type 이름과 constructor list의 쌍을 모은다."
   (if (null lst)
       acc
       (let ((line (car lst)))
@@ -64,19 +67,28 @@
 
 
 (defun collect-complex-types (lst)
+  "여러 개의 constructor를 가진 type들에 대해, type 이름과 constructor list의 쌍을 모은다."
   (collect-complex-types-inner lst ()))
 
 
 (defun collect-constructors-inner (lst acc)
   (if (null lst)
-      nil
+      acc
       (let ((line (car lst)))
         (if (str:starts-with? "|" (str:trim line))
-            (collect-constructors-inner (cdr lst) (cons line acc))
+            (collect-constructors-inner (cdr lst) (cons (str:trim line) acc))
             (collect-constructors-inner (cdr lst) acc)))))
 
+
 (defun collect-constructors (lst)
+  "하나의 type definition에 포함된 constructor list들을 모은다."
   (collect-constructors-inner lst ()))
+
+
+(defvar *simple-types-and-aliases* (collect-simple-types *refined-grammar-lines*))
+
+
+(defvar *complex-types-and-constructors* (collect-complex-types *refined-grammar-lines*))
 
 
 ;; for debugging purposes
