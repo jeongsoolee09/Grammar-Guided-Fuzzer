@@ -31,15 +31,18 @@
     (str:ends-with? "=" string_)))
 
 
-(defun collect-simple-types (line)
-  (when (and (or (search "type" line)
-                 (search "and" line))
-             (not (equal-sign-at-end-p line)))
-    (let ((lhs (car (extract-type-name line)))
-          (rhs (cdr (extract-type-name line))))
-      (setf (gethash lhs *type-constructor-table*) rhs))))
-
-;; (collect-simple-types "type program = exp")
+(defun collect-simple-types (lst acc)
+  (if (null lst)
+      acc
+      (let ((line (car lst)))
+        (if (and (or (search "type" line)
+                     (search "and" line))
+                 (not (equal-sign-at-end-p line)))
+            (let* ((lhs (car (extract-type-name line)))
+                   (rhs (cdr (extract-type-name line)))
+                   (type-and-def (cons lhs rhs)))
+              (collect-simple-types (cdr lst) (cons type-and-def acc)))
+            (collect-simple-types (cdr lst) acc)))))
 
 
 (defun collect-complex-types (lst acc)
