@@ -91,6 +91,16 @@
 (defvar *complex-types-and-constructors* (collect-complex-types *refined-grammar-lines*))
 
 
+(defun register-simple-types ()
+  (loop for cons-cell in *simple-types-and-aliases* do
+    (setf (gethash (car cons-cell) *type-constructor-table*) (cdr cons-cell))))
+
+
+(defun register-complex-types ()
+  (loop for list in *complex-types-and-constructors* do
+    (setf (gethash (car list) *type-constructor-table*) (cdr list))))
+
+
 ;; for debugging purposes
 (defun print-hash-table-entry (key value)
   (format t "~a => ~a~%" key value))
@@ -99,3 +109,8 @@
 ;; for debugging purposes
 (defun print-hash-table (hashtbl)
   (maphash #'print-hash-table-entry hashtbl))
+
+
+(defun main ()
+  (register-simple-types)
+  (register-complex-types))
