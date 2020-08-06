@@ -1,3 +1,11 @@
+(defpackage :grammar-guided-fuzzer
+  (:use
+   :common-lisp)
+  (:export
+   :open-db
+   :save
+   :store))
+
 ;; QuickLisp is needed!
 (ql:quickload "str")
 
