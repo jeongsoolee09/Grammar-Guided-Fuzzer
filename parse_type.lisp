@@ -2,9 +2,8 @@
   (:use
    :common-lisp)
   (:export
-   :open-db
-   :save
-   :store))
+   :main
+   :*type-constructor-table*))
 
 ;; QuickLisp is needed!
 (ql:quickload "str")
@@ -100,11 +99,13 @@
 
 
 (defun register-simple-types ()
+  "*simple-types-and-aliases*를 *type-constructor-table*에 하나씩 등록한다."
   (loop for cons-cell in *simple-types-and-aliases* do
     (setf (gethash (car cons-cell) *type-constructor-table*) (cdr cons-cell))))
 
 
 (defun register-complex-types ()
+  "*complex-types-and-aliases*를 *type-constructor-table*에 하나씩 등록한다."
   (loop for list in *complex-types-and-constructors* do
     (setf (gethash (car list) *type-constructor-table*) (cdr list))))
 
