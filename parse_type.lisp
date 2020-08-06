@@ -1,9 +1,4 @@
-(defpackage :grammar-guided-fuzzer
-  (:use
-   :common-lisp)
-  (:export
-   :main
-   :*type-constructor-table*))
+(in-package :grammar-guided-fuzzer.parse_type)
 
 ;; QuickLisp is needed!
 (ql:quickload "str")
